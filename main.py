@@ -4,6 +4,7 @@ import time
 import sys
 from flower import *
 from player import *
+from Bee import *
 
 # Define some colors
 BLACK = (0, 0, 0)
@@ -24,7 +25,7 @@ infoObject = pygame.display.Info()
 
 size = (SCREEN_WIDTH, SCREEN_HEIGHT)
 screen = pygame.display.set_mode(size)
-#surface = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
+# surface = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
 surface = pygame.Surface((infoObject.current_w, infoObject.current_h))
 
 pygame.display.set_caption("My Game")
@@ -48,13 +49,25 @@ def create_flowers(num_flowers):
         flowers.add(entitiy)
 
 
+def create_bees(num_bees):
+    for entity in range(num_bees):
+        entity = Bee(flowers,
+                     SCREEN_WIDTH,
+                     SCREEN_HEIGHT,
+                     )
+        bees.add(entity)
+
+
 player = Player()
 all_sprites = pygame.sprite.Group()
 flowers = pygame.sprite.Group()
+bees = pygame.sprite.Group()
 
-create_flowers(10)
+create_flowers(100)
+create_bees(100)
 
 all_sprites.add(player)
+
 
 # load font, prepare values
 font = pygame.font.Font(None, 32)
@@ -78,6 +91,7 @@ while not done:
     # player.update()
     all_sprites.update()
     flowers.update()
+    bees.update()
 
     if len(flowers) == 0:
         create_flowers(25)
@@ -97,6 +111,10 @@ while not done:
         surface.blit(entity.image, entity.rect)
         entity.move()
 
+    for entity in bees:
+        surface.blit(entity.image, entity.rect)
+        entity.move()
+
     # To be run if collision occurs between Player and Flower
     # check if the bee has collided with the flowers, and if so
     # remove the pollen from the flower and add it to the bee.
@@ -104,7 +122,6 @@ while not done:
         collided = pygame.sprite.spritecollide(player, flowers, False)
         collided[0].contact = True
         if collided[0].pollen > 0:
-            print('Taking Pollen ---')
             collided[0].update()
             player.update_pollen()
         pygame.display.update()
@@ -117,7 +134,7 @@ while not done:
             flowers.remove(entity)
 
     # --- Go ahead and update the screen with what we've drawn.
-    #scaled_win = pygame.transform.smoothscale(surface, (SCREEN_WIDTH, SCREEN_HEIGHT))
+    # scaled_win = pygame.transform.smoothscale(surface, (SCREEN_WIDTH, SCREEN_HEIGHT))
     # or scaled_win = pygame.transform.scale(win, display_win.get_size())
     screen.blit(surface, (0, 0))
     show_score(15, 15)

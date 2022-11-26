@@ -16,7 +16,7 @@ class Flower(pygame.sprite.Sprite):
         screen_height = screen_height
         self.image = random.choice(self.images)
         self.rect = self.image.get_rect()
-        self.rect.center = (random.randint(32, screen_width), random.randint(32, screen_height))
+        self.rect.center = (random.randint(32, screen_width-32), random.randint(32, screen_height-32))
         self.pollen = random.randint(1, pollen_ammount)
         self.contact = False
 
