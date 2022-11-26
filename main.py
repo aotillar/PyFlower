@@ -12,6 +12,7 @@ BLUE = (0, 0, 255)
 GREEN = (0, 155, 50)
 RED = (255, 0, 0)
 
+# test comment
 PI = 3.141592653
 
 pygame.init()
