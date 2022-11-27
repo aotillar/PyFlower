@@ -26,5 +26,6 @@ class Hive(pygame.sprite.Sprite):
             if self.pollen >= 0 and entity.pollen >=0:
                 self.pollen += entity.pollen
 
-    def create_new_bee:
+    def create_new_bee(self):
         self.pollen -= 250
+
