@@ -24,8 +24,10 @@ class Hive(pygame.sprite.Sprite):
     def update(self, entity):
         if self.contact:
             if self.pollen >= 0 and entity.pollen >=0:
-                self.pollen += entity.pollen
+                drop_pollen = entity.pollen
+                self.pollen += drop_pollen
+                entity.pollen = 0
 
-    def create_new_bee(self):
-        self.pollen -= 250
+    def create_bees(self, bee_number):
+        self.pollen -= 250 * bee_number
 

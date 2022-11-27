@@ -14,7 +14,6 @@ BLUE = (0, 0, 255)
 GREEN = (0, 155, 50)
 RED = (255, 0, 0)
 
-# test comment
 PI = 3.141592653
 
 pygame.init()
@@ -41,14 +40,15 @@ clock = pygame.time.Clock()
 # User events
 
 
-# Game initiliazation code
+# Global Functions
+
 
 def create_flowers(num_flowers):
     for entitiy in range(num_flowers):
         entitiy = Flower(
             SCREEN_WIDTH,
             SCREEN_HEIGHT,
-            25
+            150
         )
         flowers.add(entitiy)
 
@@ -62,21 +62,6 @@ def create_bees(num_bees):
         bees.add(entity)
 
 
-player = Player()
-all_sprites = pygame.sprite.Group()
-flowers = pygame.sprite.Group()
-bees = pygame.sprite.Group()
-hive = Hive(SCREEN_WIDTH, SCREEN_HEIGHT)
-
-create_flowers(50)
-create_bees(15)
-
-all_sprites.add(player)
-
-# load font, prepare values
-font = pygame.font.Font(None, 32)
-
-
 def show_player_score(x, y):
     score = font.render("Player Pollen :" + str(player.pollen), True, (0, 0, 0))
     screen.blit(score, (x, y))
@@ -87,6 +72,35 @@ def show_hive_score(x, y):
     screen.blit(score, (x, y))
 
 
+def show_hive_pop(x, y):
+    score = font.render("Hive Population :" + str(len(bees)), True, (0, 0, 0))
+    screen.blit(score, (x, y))
+
+
+def show_day_counter(x, y):
+    score = font.render("Day :" + str(day_counter), True, (0, 0, 0))
+    screen.blit(score, (x, y))
+
+
+# Game initiliazation code
+
+player = Player()
+all_sprites = pygame.sprite.Group()
+flowers = pygame.sprite.Group()
+bees = pygame.sprite.Group()
+hive = Hive(SCREEN_WIDTH, SCREEN_HEIGHT)
+
+create_flowers(15)
+create_bees(15)
+
+all_sprites.add(player)
+
+frames_per_day_counter = 0
+day_counter = 0
+
+# load font, prepare values
+font = pygame.font.Font(None, 32)
+
 # -------- Main Program Loop -----------
 while not done:
     # --- Main event loop
@@ -95,8 +109,6 @@ while not done:
             done = True
         if event.type == pygame.K_ESCAPE:
             done = True
-        if event.type == flower_timer:
-            flower_chance = random.randint(0, 20)
 
     # --- Game logic should go here
     # player.update()
@@ -105,7 +117,11 @@ while not done:
     bees.update()
 
     if len(flowers) == 0:
-        create_flowers(25)
+        create_flowers(50)
+
+    if hive.pollen >= 500:
+        hive.create_bees(1)
+        create_bees(1)
 
     # --- Screen-clearing code goes here
 
@@ -121,7 +137,7 @@ while not done:
         entity.move()
 
     for entity in all_sprites:
-        surface.blit(entity.image, entity.rect)
+        # surface.blit(entity.image, entity.rect)
         entity.move()
 
     for entity in bees:
@@ -162,7 +178,7 @@ while not done:
         hive.contact = True
         if player.pollen > 0:
             hive.update(player)
-            player.update_hive_pollen()
+            # player.update_hive_pollen()
         pygame.display.update()
     else:
         hive.contact = False
@@ -173,14 +189,20 @@ while not done:
         hive.contact = True
         if collided[0].pollen > 0:
             hive.update(collided[0])
-            collided[0].update_hive_pollen()
+            # collided[0].update_hive_pollen()
         pygame.display.update()
     else:
         hive.contact = False
 
+    # Remove entities that have been around too long
+
     for entity in flowers:
         if entity.pollen == 0:
             flowers.remove(entity)
+
+    for entity in bees:
+        if entity.life_counter >= 1000:
+            bees.remove(entity)
 
     # --- Go ahead and update the screen with what we've drawn.
     # scaled_win = pygame.transform.smoothscale(surface, (SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -188,11 +210,19 @@ while not done:
     screen.blit(surface, (0, 0))
     show_player_score(15, 15)
     show_hive_score(260, 15)
+    show_hive_pop(460, 15)
+    show_day_counter(760,15)
 
     pygame.display.flip()
 
-    # --- Limit to 60 frames per second
-    clock.tick(24)
+    # --- Limit to 24 frames per second
+
+    frames_per_day_counter += 1
+    if frames_per_day_counter >= 300:
+        day_counter += 1
+        frames_per_day_counter = 0
+
+    clock.tick(60)
 
 # Close the window and quit.
 pygame.quit()

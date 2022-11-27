@@ -35,6 +35,10 @@ class Bee(pygame.sprite.Sprite):
 
         self.hive = hive
 
+        self.life_counter = 0
+
+        self.search_distance = random.randint(50,500)
+
         # Use to hold floats. Since Rects are only integers.
         self.center = pygame.Vector2(self.rect.center)
         self.vector = pygame.Vector2()
@@ -101,6 +105,10 @@ class Bee(pygame.sprite.Sprite):
         current_distance = self.calculate_distance(self.rect, self.closest_flower.rect)
         collided = pygame.sprite.spritecollide(self, self.flower_list, False)
 
+        if current_distance >= self.search_distance:
+            self.check_nearest_flower()
+            self.update_vectors()
+
         if self.seek_hive:
             self.angle_target(self.hive)
             self.vector.from_polar((1, math.degrees(self.angle)))
@@ -135,7 +143,7 @@ class Bee(pygame.sprite.Sprite):
         self.pollen += 1
 
     def update_hive_pollen(self):
-        self.pollen -= 10
+        self.pollen -= 1
 
     def update(self):
         if self.pollen > 40.0:
@@ -143,6 +151,8 @@ class Bee(pygame.sprite.Sprite):
         if self.pollen <= 0:
             self.pollen = 0
             self.seek_hive = False
+
+        self.life_counter += 1
 
         # Animation Code
         self.index += 1
