@@ -6,8 +6,9 @@ import math
 
 
 class Bee(pygame.sprite.Sprite):
-    def __init__(self, flower_list,screen_width, screen_height):
+    def __init__(self, flower_list,screen_width, screen_height, hive):
         super().__init__()
+        self.seek_hive = False
         self.images = []
         self.image = pygame.image.load("sprites/sprite_bee0.png")
         self.images.append(pygame.image.load("sprites/sprite_bee0.png"))
@@ -32,6 +33,8 @@ class Bee(pygame.sprite.Sprite):
         # Game Information
         self.pollen = 0
 
+        self.hive = hive
+
         # Use to hold floats. Since Rects are only integers.
         self.center = pygame.Vector2(self.rect.center)
         self.vector = pygame.Vector2()
@@ -39,8 +42,8 @@ class Bee(pygame.sprite.Sprite):
 
         # Test
         # self.angle = random.randint(0, 360)
-        self.check_nearest_flower()
-        self.update_vectors()
+        #self.check_nearest_flower()
+        #self.update_vectors()
 
 
     def update_vectors(self):
@@ -51,7 +54,16 @@ class Bee(pygame.sprite.Sprite):
         """
         self.angle = math.atan2(self.closest_flower.rect.center[1] - self.rect.center[1],
                                 self.closest_flower.rect.center[0] - self.rect.center[0])
-        pass
+
+    def angle_target(self,target):
+        """
+        We calculate the angle to the nearest flower
+
+        :return:
+        """
+        self.angle = math.atan2(target.rect.center[1] - self.rect.center[1],
+                                target.rect.center[0] - self.rect.center[0])
+
 
     def check_nearest_flower(self):
         """
@@ -84,18 +96,28 @@ class Bee(pygame.sprite.Sprite):
         return distance
 
     def move(self):
+        self.check_nearest_flower()
+        self.update_vectors()
         current_distance = self.calculate_distance(self.rect, self.closest_flower.rect)
-        print("Calculated Current Distance as : ", current_distance)
-
         collided = pygame.sprite.spritecollide(self, self.flower_list, False)
-        print('Collided',collided)
-        if not collided:
+
+        if self.seek_hive:
+            self.angle_target(self.hive)
             self.vector.from_polar((1, math.degrees(self.angle)))
-            print(self.vector * self.speed)
+            self.center += self.vector * self.speed
+            self.rect.center = self.center
+
+        elif not collided:
+            self.vector.from_polar((1, math.degrees(self.angle)))
             self.center += self.vector * self.speed
             self.rect.center = self.center
             current_distance -= abs(self.vector[0] * self.speed)
-            print('New Current Distance', current_distance)
+
+
+
+
+
+
 
 
         '''if current_distance > 1.0:
@@ -112,8 +134,15 @@ class Bee(pygame.sprite.Sprite):
     def update_pollen(self):
         self.pollen += 1
 
+    def update_hive_pollen(self):
+        self.pollen -= 10
+
     def update(self):
-        # instead lets put the logic.update section here
+        if self.pollen > 40.0:
+            self.seek_hive = True
+        if self.pollen <= 0:
+            self.pollen = 0
+            self.seek_hive = False
 
         # Animation Code
         self.index += 1

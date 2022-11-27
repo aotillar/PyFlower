@@ -51,8 +51,11 @@ class Player(pygame.sprite.Sprite):
     def draw(self, surface):
         surface.blit(self.image, self.rect)
 
-    def update_pollen(self):
+    def update_flower_pollen(self):
         self.pollen += 1
+
+    def update_hive_pollen(self):
+        self.pollen -= 1
 
     def update(self):
         self.input()

@@ -29,7 +29,6 @@ class Flower(pygame.sprite.Sprite):
     def update(self):
         if self.pollen > 0 and self.contact:
             self.pollen -= 1
-            print('updating pollen')
 
     def update_death(self):
         pass
