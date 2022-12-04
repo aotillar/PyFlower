@@ -6,7 +6,7 @@ import math
 
 
 class Bee(pygame.sprite.Sprite):
-    def __init__(self, flower_list,screen_width, screen_height, hive):
+    def __init__(self, flower_list, screen_width, screen_height, hive):
         super().__init__()
         self.seek_hive = False
         self.images = []
@@ -22,13 +22,13 @@ class Bee(pygame.sprite.Sprite):
         self.image = self.images[self.index]
 
         self.rect = self.image.get_rect()
-        self.rect.center = (32,64)
+        self.rect.center = (hive.rect.center)
 
         self.flower_list = flower_list
         self.closest_flower = None
 
         self.direction = pygame.math.Vector2()
-        self.speed = 10
+        self.speed = 20
 
         # Game Information
         self.pollen = 0
@@ -39,13 +39,12 @@ class Bee(pygame.sprite.Sprite):
 
         self.search_distance = random.randint(50, 1000)
 
-        self.pollen_limit = random.randint(20,60)
+        self.pollen_limit = random.randint(20, 60)
 
         # Use to hold floats. Since Rects are only integers.
         self.center = pygame.Vector2(self.rect.center)
         self.vector = pygame.Vector2()
         self.angle = 2
-
 
     def update_vectors(self):
         """
@@ -56,7 +55,7 @@ class Bee(pygame.sprite.Sprite):
         self.angle = math.atan2(self.closest_flower.rect.center[1] - self.rect.center[1],
                                 self.closest_flower.rect.center[0] - self.rect.center[0])
 
-    def angle_target(self,target):
+    def angle_target(self, target):
         """
         We calculate the angle to the nearest flower
 
@@ -65,11 +64,8 @@ class Bee(pygame.sprite.Sprite):
         self.angle = math.atan2(target.rect.center[1] - self.rect.center[1],
                                 target.rect.center[0] - self.rect.center[0])
 
-
     def check_nearest_flower(self):
         """
-        dist = math.hypot(x1-x2, y1-y2)
-
         vector1 = pygame.Vector2(cube1.center)
         vector2 = pygame.Vector2(cube2.center)
         distance = vector1.distance_to(vector2) # returns a float.

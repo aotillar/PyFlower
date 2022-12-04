@@ -6,6 +6,7 @@ from flower import *
 from player import *
 from Bee import *
 from Hive import *
+from Grass import *
 
 
 class BeeSim():
@@ -16,7 +17,7 @@ class BeeSim():
         self.BLACK = (0, 0, 0)
         self.WHITE = (255, 255, 254)
         self.BLUE = (0, 0, 255)
-        self.GREEN = (0, 155, 50)
+        self.GREEN = (72, 125, 22)
         self.RED = (255, 0, 0)
 
         self.PI = 3.141592653
@@ -41,8 +42,9 @@ class BeeSim():
         self.frames_per_day = 3000
         self.day_counter = 0
 
-        self.flower_pollen_upper = 7500
-        self.bee_life_limit = 3000
+        self.flower_pollen_upper = 60
+        self.bee_life_limit = 1200
+
 
         # Used to manage how fast the screen updates
         self.clock = pygame.time.Clock()
@@ -65,6 +67,11 @@ class BeeSim():
                          self.hive)
             self.bees.add(entity)
 
+    def create_grass(self,grass_num):
+        for entity in range(grass_num):
+            entity = Grass(self.SCREEN_WIDTH,
+                           self.SCREEN_HEIGHT)
+            self.grass.add(entity)
     def show_player_score(self, x, y):
         score = self.font.render("Player Pollen :" + str(self.player.pollen), True, (0, 0, 0))
         self.screen.blit(score, (x, y))
@@ -86,19 +93,21 @@ class BeeSim():
         self.screen.blit(score, (x, y))
 
     def show_honey_store(self, x, y):
-        score = self.font.render("Honey Store:" + str(self.hive.honey_store), True, (0, 0, 0))
+        score = self.font.render("Honey Store:" + str(round(self.hive.honey_store,2)), True, (0, 0, 0))
         self.screen.blit(score, (x, y))
 
     def initialize_game(self, bee_number, flower_number):
         self.player = Player()
         self.all_sprites = pygame.sprite.Group()
         self.flowers = pygame.sprite.Group()
+        self.grass = pygame.sprite.Group()
         self.bees = pygame.sprite.Group()
         self.hive = Hive(self.SCREEN_WIDTH, self.SCREEN_HEIGHT)
 
         self.create_flowers(bee_number)
         self.create_bees(flower_number)
         self.all_sprites.add(self.player)
+        self.create_grass(125)
 
         self.font = pygame.font.Font(None, 32)
 
@@ -123,7 +132,7 @@ class BeeSim():
 
             # This doesnt belong here
 
-            if self.hive.honey >= 150:
+            if self.hive.honey >= self.hive.honey_per_bee:
                 self.hive.create_bees(1)
                 self.create_bees(1)
 
@@ -136,6 +145,9 @@ class BeeSim():
 
             self.surface.blit(self.hive.image, self.hive.rect)
 
+            for entity in self.grass:
+                self.surface.blit(entity.image,entity.rect)
+
             for entity in self.flowers:
                 self.surface.blit(entity.image, entity.rect)
                 entity.move()
@@ -147,6 +159,8 @@ class BeeSim():
             for entity in self.bees:
                 self.surface.blit(entity.image, entity.rect)
                 entity.move()
+
+
 
             # To be run if collision occurs between Player and Flower
             # check if the bee has collided with the flowers, and if so
@@ -180,7 +194,7 @@ class BeeSim():
             # Check for Player Hive Collision
             if pygame.sprite.collide_rect(self.player, self.hive):
                 self.hive.contact = True
-                if self.layer.pollen > 0:
+                if self.player.pollen > 0:
                     self.hive.update(player, bees)
                     # player.update_hive_pollen()
                 pygame.display.update()
@@ -214,9 +228,11 @@ class BeeSim():
 
             # Use Stored Honey
             if len(self.bees) == 1:
-                able_toMake = int(self.hive.honey_store / 150)
+                print('MAKING BEES FROM HONEY-#-#-#-#-#-#')
+                able_toMake = int(self.hive.honey_store / self.hive.bee_honey_from_store)
                 self.hive.create_bees_fromStore(able_toMake)
                 self.create_bees(able_toMake)
+                print(able_toMake)
             elif len(self.bees) == 0:
                 print("Total Days This Gen: ", self.day_counter)
                 self.initialize_game(15,15)

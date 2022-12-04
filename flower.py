@@ -10,7 +10,18 @@ class Flower(pygame.sprite.Sprite):
         self.images = [
             pygame.image.load("sprites/flower.png"),
             pygame.image.load("sprites/flower_red.png"),
-            pygame.image.load("sprites/flower_blue.png")
+            pygame.image.load("sprites/flower_blue.png"),
+            pygame.image.load("sprites/flower_8petal.png"),
+            pygame.image.load("sprites/flower_pink.png"),
+            pygame.image.load("sprites/flower_turquiose.png"),
+            pygame.image.load("sprites/flower_umber.png"),
+            pygame.image.load("sprites/flower_yellow.png"),
+            pygame.image.load("sprites/4petal_flower.png"),
+            pygame.image.load("sprites/cactus_1.png"),
+            pygame.image.load("sprites/flower_pink.png"),
+            pygame.image.load("sprites/grass_flowers.png"),
+            pygame.image.load("sprites/small_blue_flower.png"),
+            pygame.image.load("sprites/small_red_flower.png")
         ]
         screen_width = screen_width
         screen_height = screen_height

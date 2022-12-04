@@ -11,16 +11,26 @@ class Hive(pygame.sprite.Sprite):
         screen_height = screen_height
         self.image = pygame.image.load("sprites/Beehive.png")
         self.rect = self.image.get_rect()
-        self.rect.center = (32, 64)
+        self.rect.center = (random.randint(0,screen_width-32), random.randint(0,screen_height)-32)
         self.pollen = 0
         self.honey = 0
         self.honey_timer = 0
         self.honey_store = 0
         self.contact = False
         self.bee_pop = 0
-        self.honey_requirement = 0.25 * self.bee_pop + 75
-        self.honey_rate = round(random.uniform(0.015, 0.5), 2)
-        print(self.honey_rate)
+        self.honey_pollenCost = 75
+        self.honey_requirement = 0.25 * self.bee_pop + self.honey_pollenCost
+        self.honey_rate = round(random.uniform(0.015, 1.0), 3)
+        self.bee_honey_from_store = 50
+        self.honey_per_bee = 150
+
+        self.honey_store_rate = round(random.uniform(0.05, 5.0),2)
+        print("hive.honey_rate",self.honey_rate)
+        print("hive.honey_store_rate",self.honey_store_rate)
+        print("hive.honey_requirement",self.honey_requirement)
+        print("hive.honey_pollenCost",self.honey_pollenCost)
+        print("hive.bee_honey_from_store", self.bee_honey_from_store)
+        print("hive.honey_bee_requirement", self.honey_per_bee)
 
     def draw(self, surface):
         surface.blit(self.image, self.rect)
@@ -43,10 +53,10 @@ class Hive(pygame.sprite.Sprite):
         self.bee_pop = len(bee_list)
 
     def create_bees(self, bee_number):
-        self.honey -= 150 * bee_number
+        self.honey -= self.honey_per_bee * bee_number
 
     def create_bees_fromStore(self, bee_number):
-        self.honey_store -= 50 * bee_number
+        self.honey_store -= self.bee_honey_from_store * bee_number
 
     def create_honey(self):
         """
@@ -61,13 +71,11 @@ class Hive(pygame.sprite.Sprite):
         :return:
         """
 
-        if self.pollen >= self.honey_requirement:
-
-            self.pollen -= self.honey_rate * self.bee_pop + 75
-            self.honey += self.honey_rate * self.bee_pop
-            self.store_honey()
-            if self.pollen <= 0:
-                self.pollen = 0
+        self.pollen -= self.honey_rate * self.bee_pop + self.honey_pollenCost
+        self.honey += self.honey_rate * self.bee_pop
+        self.store_honey()
+        if self.pollen <= 0:
+            self.pollen = 0
 
     def store_honey(self):
-        self.honey_store += 0.5
+        self.honey_store += self.honey_store_rate
